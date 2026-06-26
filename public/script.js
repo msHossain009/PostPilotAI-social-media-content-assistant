@@ -113,6 +113,7 @@ function renderResults(sections) {
   }
 
   emptyState.hidden    = true;
+  emptyState.style.display = 'none';
   resultsGrid.hidden   = false;
   btnRegenerate.hidden = false;
 
