@@ -1,5 +1,5 @@
 {
-  "name": "koroai-social-media-content-assistant",
+  "name": "postpilot-ai-social-media-content-assistant",
   "version": "1.0.0",
   "description": "AI-powered social media content assistant for small businesses and creators",
   "main": "server.js",

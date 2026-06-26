@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────
-// server.js — KoroAI Express backend
+// server.js — PostPilot AI Express backend
 // This file is the entry point for the Node.js server.
 // It serves the frontend files and connects the API routes.
 // ─────────────────────────────────────────────────────────────────
@@ -36,6 +36,6 @@ app.get('*', (req, res) => {
 
 // ── Start listening ───────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`✅  KoroAI server running at http://localhost:${PORT}`);
+  console.log(`✅  PostPilot AI server running at http://localhost:${PORT}`);
   console.log(`    Environment: ${process.env.NODE_ENV || 'development'}`);
 });
