@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PostPilot AI — Social Media Content Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+          <path d="M10 22V10l6 4-6 4zm8-8l4 4-4 4" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">PostPilot <span class="logo-ai">AI</span></span>
+      </div>
+      <p class="site-tagline">AI-powered content for creators &amp; small businesses</p>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container main-layout">
+
+    <!-- LEFT: Form -->
+    <section class="panel panel-form" aria-label="Content generation form">
+      <h2 class="panel-title">Create Your Content</h2>
+      <p class="panel-subtitle">
+        Describe your product and let AI generate captions, hashtags, scripts, and more.
+      </p>
+
+      <form id="generate-form" novalidate>
+
+        <!-- PRODUCT NAME -->
+        <div class="field-group">
+          <label for="productName" class="field-label">Product / Business Name</label>
+          <input
+            type="text"
+            id="productName"
+            name="productName"
+            class="field-input"
+            placeholder="e.g. GlowCandle Co."
+          />
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="field-group">
+          <label for="businessDescription" class="field-label">
+            Description
+            <span class="required" aria-label="required">*</span>
+          </label>
+          <textarea
+            id="businessDescription"
+            name="businessDescription"
+            class="field-textarea"
+            rows="4"
+            maxlength="500"
+            placeholder="e.g. Handmade soy candles — calm, luxury, eco-friendly. Great for gift sets and home decor."
+            required
+          ></textarea>
+          <span class="char-counter" id="char-counter">0 / 500</span>
+        </div>
+
+        <!-- PLATFORM & TONE -->
+        <div class="field-row">
+          <div class="field-group">
+            <label for="platform" class="field-label">Platform</label>
+            <select id="platform" name="platform" class="field-select">
+              <option value="Instagram">Instagram</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="X (Twitter)">X / Twitter</option>
+              <option value="TikTok">TikTok</option>
+              <option value="Facebook">Facebook</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="tone" class="field-label">Tone</label>
+            <select id="tone" name="tone" class="field-select">
+              <option value="Casual">Casual</option>
+              <option value="Professional">Professional</option>
+              <option value="Witty">Witty</option>
+              <option value="Inspirational">Inspirational</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- LANGUAGE & GOAL -->
+        <div class="field-row">
+          <div class="field-group">
+            <label for="language" class="field-label">Language</label>
+            <select id="language" name="language" class="field-select">
+              <option value="English">English</option>
+              <option value="Bengali">Bengali (Bangla)</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="Arabic">Arabic</option>
+              <option value="Swahili">Swahili</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="campaignGoal" class="field-label">Campaign Goal</label>
+            <select id="campaignGoal" name="campaignGoal" class="field-select">
+              <option value="Engagement">Engagement</option>
+              <option value="Brand Awareness">Brand Awareness</option>
+              <option value="Sales">Sales</option>
+              <option value="Website Traffic">Website Traffic</option>
+              <option value="Community Building">Community Building</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <p class="form-error" id="form-error" role="alert" aria-live="polite"></p>
+
+        <!-- BUTTONS -->
+        <div class="btn-row">
+          <button type="submit" class="btn-generate" id="btn-generate">
+            <span class="spinner" id="btn-spinner" aria-hidden="true"></span>
+            <span id="btn-label">Generate Content</span>
+          </button>
+          <button type="button" class="btn-clear" id="btn-clear">Clear</button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- RIGHT: Results -->
+    <section class="panel panel-results" aria-label="Generated content" id="results-panel">
+
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="23" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="4 4"/>
+            <path d="M24 16v16m-8-8h16" stroke="#c4c9d4" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="empty-title">Your content will appear here</p>
+        <p class="empty-sub">Fill in the form and click <strong>Generate Content</strong>.</p>
+      </div>
+
+      <div class="results-grid" id="results-grid" hidden>
+
+        <div class="result-card" id="card-caption">
+          <div class="result-card-header">
+            <span class="result-icon caption-icon"></span>
+            <h3 class="result-title">Caption</h3>
+            <button type="button" class="btn-copy" data-target="text-caption" aria-label="Copy caption">Copy</button>
+          </div>
+          <p class="result-text" id="text-caption"></p>
+        </div>
+
+        <div class="result-card" id="card-hashtags">
+          <div class="result-card-header">
+            <span class="result-icon hashtag-icon">#</span>
+            <h3 class="result-title">Hashtags</h3>
+            <button type="button" class="btn-copy" data-target="text-hashtags" aria-label="Copy hashtags">Copy</button>
+          </div>
+          <p class="result-text hashtag-text" id="text-hashtags"></p>
+        </div>
+
+        <div class="result-card" id="card-headline">
+          <div class="result-card-header">
+            <span class="result-icon headline-icon"></span>
+            <h3 class="result-title">Poster Headline</h3>
+            <button class="btn-copy" data-target="text-headline" aria-label="Copy headline">Copy</button>
+          </div>
+          <p class="result-text headline-text" id="text-headline"></p>
+        </div>
+
+        <div class="result-card" id="card-slogan">
+          <div class="result-card-header">
+            <span class="result-icon slogan-icon"></span>
+            <h3 class="result-title">Slogan</h3>
+            <button class="btn-copy" data-target="text-slogan" aria-label="Copy slogan">Copy</button>
+          </div>
+          <p class="result-text slogan-text" id="text-slogan"></p>
+        </div>
+
+        <div class="result-card" id="card-cta">
+          <div class="result-card-header">
+            <span class="result-icon cta-icon"></span>
+            <h3 class="result-title">Call-to-Action</h3>
+            <button class="btn-copy" data-target="text-cta" aria-label="Copy CTA">Copy</button>
+          </div>
+          <p class="result-text" id="text-cta"></p>
+        </div>
+
+        <div class="result-card card-wide" id="card-video">
+          <div class="result-card-header">
+            <span class="result-icon video-icon"></span>
+            <h3 class="result-title">Video Script</h3>
+            <button class="btn-copy" data-target="text-video" aria-label="Copy video script">Copy</button>
+          </div>
+          <pre class="result-text script-text" id="text-video"></pre>
+        </div>
+
+      </div>
+
+      <button type="button" class="btn-regenerate" id="btn-regenerate" hidden>
+        Regenerate
+      </button>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>Built with AI for the July Challenge &middot; Reimagine Creative Industries with AI</p>
+  </footer>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
