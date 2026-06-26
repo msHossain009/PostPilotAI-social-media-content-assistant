@@ -87,7 +87,7 @@ async function generateContent(payload) {
     renderResults(data.result);
 
   } catch (networkError) {
-    showError('Could not reach the server. Make sure it is running (npm start).');
+    showError('Could not reach the server. Please try again in a moment.');
     console.error('Network error:', networkError);
   } finally {
     setLoading(false);

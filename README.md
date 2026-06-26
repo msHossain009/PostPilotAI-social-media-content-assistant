@@ -140,8 +140,8 @@ AI_MODEL=ibm/granite-13b-chat-v2
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/KoroAI/koroai-social-media-content-assistant.git
-   cd koroai-social-media-content-assistant
+   git clone https://github.com/msHossain009/PostPilotAI-social-media-content-assistant.git
+   cd PostPilotAI-social-media-content-assistant
    ```
 
 2. **Install dependencies**
@@ -178,15 +178,40 @@ AI_MODEL=ibm/granite-13b-chat-v2
 
 ---
 
-## Environment Variables
+## Deploy to Vercel (Free)
+
+### Steps
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Go to [vercel.com](https://vercel.com)** and sign in with GitHub
+
+3. **Import your repository**
+   - Click "New Project"
+   - Select `PostPilotAI-social-media-content-assistant`
+   - Click "Import"
+
+4. **Add Environment Variables**
+   - `AI_API_KEY` — Your API key
+   - `AI_BASE_URL` — `https://api.openai.com/v1`
+   - `AI_MODEL` — `gpt-4o-mini`
+
+5. **Click "Deploy"**
+
+6. **Done!** Your app will be live at `https://your-project.vercel.app`
+
+### Environment Variables (Vercel)
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `AI_API_KEY` | Yes | API key from your AI provider |
 | `AI_BASE_URL` | Yes | Base URL of the AI API endpoint |
 | `AI_MODEL` | Yes | Model name to use for generation |
-| `PORT` | No | Server port (default: 3000) |
-| `NODE_ENV` | No | Set to `production` for deployment |
 
 ---
 
