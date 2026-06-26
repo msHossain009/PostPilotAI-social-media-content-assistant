@@ -1,22 +1,16 @@
 // api/generate.js — Vercel Serverless Function
-// This runs on Vercel's server, NOT in the browser.
-// The API key is safe here — it's stored in Vercel's environment variables.
-
-const fetch = require('node-fetch');
+// Uses built-in fetch (Node 18+) — no external dependencies needed.
 
 module.exports = async function handler(req, res) {
-  // CORS headers for cross-origin requests
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
@@ -36,7 +30,6 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // Build the prompt
   const messages = buildPrompt({
     productName,
     businessDescription,
@@ -53,7 +46,7 @@ module.exports = async function handler(req, res) {
 
     if (!apiKey) {
       return res.status(500).json({
-        error: 'AI API key is not configured. Please add AI_API_KEY in Vercel environment variables.',
+        error: 'AI API key not configured. Add AI_API_KEY in Vercel environment variables.',
       });
     }
 
@@ -77,11 +70,11 @@ module.exports = async function handler(req, res) {
 
       let errorMessage = `AI service error (${response.status}).`;
       if (response.status === 401) {
-        errorMessage = 'Invalid API key. Please check your AI_API_KEY in Vercel settings.';
+        errorMessage = 'Invalid API key. Check AI_API_KEY in Vercel settings.';
       } else if (response.status === 429) {
         errorMessage = 'Rate limit exceeded. Please wait and try again.';
       } else if (response.status === 503) {
-        errorMessage = 'AI service temporarily unavailable. Please try again later.';
+        errorMessage = 'AI service temporarily unavailable.';
       }
 
       return res.status(502).json({ error: errorMessage });
@@ -92,7 +85,7 @@ module.exports = async function handler(req, res) {
 
     if (!rawText) {
       return res.status(502).json({
-        error: 'The AI returned an empty response. Please try again.',
+        error: 'AI returned an empty response. Please try again.',
       });
     }
 
@@ -104,7 +97,7 @@ module.exports = async function handler(req, res) {
 
     if (err.code === 'ENOTFOUND') {
       return res.status(502).json({
-        error: 'Could not connect to AI service. Please check your AI_BASE_URL.',
+        error: 'Could not connect to AI service. Check AI_BASE_URL.',
       });
     }
 
@@ -114,62 +107,45 @@ module.exports = async function handler(req, res) {
   }
 };
 
-// Prompt builder (same as prompts/templates.js but inlined for Vercel)
 function buildPrompt({ productName, businessDescription, platform, tone, language, campaignGoal }) {
   const systemMessage = {
     role: 'system',
-    content: `You are a world-class social media strategist and creative copywriter with 10+ years of experience helping brands grow online. You specialize in crafting high-converting, platform-native content that feels authentic and drives real engagement.
+    content: `You are a world-class social media strategist and creative copywriter with 10+ years of experience helping brands grow online.
 
-YOUR EXPERTISE:
-- You understand the nuances of each social media platform (Instagram, LinkedIn, X/Twitter, TikTok, Facebook)
-- You know how to adapt tone, length, and style for different audiences
-- You create content that stops the scroll and sparks conversation
-- You avoid generic, templated content — every piece you write is unique to the brand
-
-RULES YOU MUST FOLLOW:
+RULES:
 1. Write ALL content in ${language || 'English'}.
-2. Tailor EVERY piece of content specifically for ${platform || 'Instagram'}.
-3. Use a ${tone || 'Casual'} tone consistently throughout.
-4. Align all content with the campaign goal: ${campaignGoal || 'Engagement'}.
-5. NEVER use generic phrases like "Check out our..." or "Don't miss..." without tying them to the specific product.
-6. Reference the actual product name and specific details from the description.
-7. Make content feel human, relatable, and authentic — not robotic or salesy.
-8. Use platform-specific best practices:
-   - Instagram: Visual language, emoji usage, line breaks for readability
-   - LinkedIn: Professional insights, thought leadership, value-driven
-   - X/Twitter: Concise, punchy, conversation-starting
-   - TikTok: Trendy, hook-first, Gen-Z friendly language
-   - Facebook: Community-focused, storytelling, conversational
+2. Tailor EVERY piece for ${platform || 'Instagram'}.
+3. Use a ${tone || 'Casual'} tone throughout.
+4. Align with campaign goal: ${campaignGoal || 'Engagement'}.
+5. Reference the actual product name from the description.
+6. Make content feel human, not robotic.
 
 OUTPUT FORMAT — Return EXACTLY these six sections with "## " headers:
 
 ## Caption
-Write a platform-native caption (2-4 short paragraphs). Include emojis where natural. Make it scroll-stopping. Reference the specific product/business by name.
+Platform-native caption (2-4 short paragraphs) with emojis where natural. Reference the product by name.
 
 ## Hashtags
-Provide 10-15 relevant hashtags as a single line, space-separated. Mix popular and niche hashtags. Include branded hashtags if applicable.
+10-15 relevant hashtags, space-separated.
 
 ## Headline
-Write ONE punchy poster/ad headline (max 10 words). Make it memorable and benefit-focused.
+ONE punchy poster/ad headline (max 10 words).
 
 ## Slogan
-Create ONE memorable brand tagline (max 8 words). It should capture the essence of the product.
+ONE memorable tagline (max 8 words).
 
 ## CTA
-Provide 2-3 call-to-action variants (numbered list). Each should be specific to the product and campaign goal.
+2-3 call-to-action variants (numbered list).
 
 ## Video Script
-Write a 30-60 second video script with these sections labeled:
-[HOOK] — First 3 seconds to grab attention
-[BODY] — Main message (15-40 seconds)
-[CTA] — Closing call-to-action (5-10 seconds)
+30-60 second script with [HOOK], [BODY], [CTA] labels.
 
-IMPORTANT: Do NOT include any meta-commentary, explanations, or text outside these six sections. Return ONLY the content under each header.`,
+IMPORTANT: Return ONLY content under each header, no extra text.`,
   };
 
   const userMessage = {
     role: 'user',
-    content: `Create professional social media content for:
+    content: `Create social media content for:
 
 Product/Business Name: "${productName ? productName.trim() : 'Not specified'}"
 Description: "${businessDescription.trim()}"
@@ -179,13 +155,12 @@ Tone: ${tone || 'Casual'}
 Language: ${language || 'English'}
 Campaign Goal: ${campaignGoal || 'Engagement'}
 
-Generate all six sections (Caption, Hashtags, Headline, Slogan, CTA, Video Script) following the exact format specified. Make the content specific to this product — avoid generic copy.`,
+Generate all six sections.`,
   };
 
   return [systemMessage, userMessage];
 }
 
-// Parse sections from AI output
 function parseSections(text) {
   const sections = {
     caption: '',
